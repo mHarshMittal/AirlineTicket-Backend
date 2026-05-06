@@ -1,0 +1,82 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+
+
+      # Global CORS configuration (frontend to gateway)
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:3000"     # Only your frontend (React) can call backend
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+            maxAge: 3600
+
+      # Route configuration (API Gateway routing logic)
+      routes:
+
+        # Auth Service - handles login/register APIs
+        - id: auth-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/auth/**
+
+        # Flight Service - flight-related APIs
+        - id: flight-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/flights/**
+
+        # Booking Service - booking APIs
+        - id: booking-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/bookings/**
+
+        # Passenger Service  - passengers APIs
+        - id: passenger-service
+          uri: http://localhost:8084
+          predicates:
+            - Path=/passengers/**
+
+        # Payment Service - payments APIs
+        - id: payment-service
+          uri: http://localhost:8085
+          predicates:
+            - Path=/payments/**
+
+        # Seat Service  seat selection APIs
+        - id: seat-service
+          uri: http://localhost:8086
+          predicates:
+            - Path=/seats/**
+
+        # Airline Service - airline + airport APIs
+        - id: airline-service
+          uri: http://localhost:8087
+          predicates:
+            - Path=/airlines/**,/airports/**
+
+# Actuator (health check & monitoring)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
