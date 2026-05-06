@@ -1,0 +1,19 @@
+package com.skybooker.booking.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class BookingResponse {
+    private Long    bookingId;
+    private String  message;
+    private boolean success;
+    private Long    flightId;
+    private String  userEmail;
+    private int     seatsBooked;
+    private String  status;
+    private String  pnr;
+}
