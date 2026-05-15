@@ -8,7 +8,11 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestTemplate;
 
 import javax.crypto.SecretKey;
@@ -24,10 +28,15 @@ public class FlightServiceImpl implements FlightService {
     private final FlightRepository flightRepository;
     private final RestTemplate restTemplate;
 
-    private static final String SEAT_SERVICE_URL = "http://localhost:8086/seats";
+    @Value("${service.seat.url}")
+    private String SEAT_SERVICE_URL;
     private static final String JWT_SECRET = "OPqzAzTkewv1#+WU9&Z*_BsJ7w2z1O!QIv+i&+049po94&%Y$JjwH645*StuUYW^";
 
     @Override
+    @Caching(evict = {
+        @CacheEvict(value = "flights", allEntries = true),
+        @CacheEvict(value = "flights:search", allEntries = true)
+    })
     public FlightResponse addFlight(FlightRequest request) {
 
         // ── DATE VALIDATION ───────────────────────────────────────
@@ -165,6 +174,7 @@ public class FlightServiceImpl implements FlightService {
     }
 
     @Override
+    @Cacheable(value = "flights", key = "'all'", unless = "#result == null || #result.isEmpty()")
     public List<FlightResponse> getAllFlights() {
         return flightRepository.findAll()
                 .stream()
@@ -173,6 +183,7 @@ public class FlightServiceImpl implements FlightService {
     }
 
     @Override
+    @Cacheable(value = "flights:search", key = "#source + '-' + #destination + '-' + #date", unless = "#result == null || #result.isEmpty()")
     public List<FlightResponse> searchFlights(String source, String destination, LocalDate date) {
         return flightRepository
                 .findBySourceAndDestinationAndDepartureDate(source, destination, date)
@@ -182,6 +193,7 @@ public class FlightServiceImpl implements FlightService {
     }
 
     @Override
+    @Cacheable(value = "flights:id", key = "#id")
     public FlightResponse getFlightById(Long id) {
         Flight flight = flightRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Flight not found with id: " + id));
@@ -189,6 +201,11 @@ public class FlightServiceImpl implements FlightService {
     }
 
     @Override
+    @Caching(evict = {
+        @CacheEvict(value = "flights:id", key = "#id"),
+        @CacheEvict(value = "flights", allEntries = true),
+        @CacheEvict(value = "flights:search", allEntries = true)
+    })
     public String reduceSeats(Long id, int seats) {
         Flight flight = flightRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Flight not found"));
