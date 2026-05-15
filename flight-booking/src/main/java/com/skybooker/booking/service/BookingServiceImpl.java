@@ -5,6 +5,7 @@ import com.skybooker.booking.dto.BookingResponse;
 import com.skybooker.booking.entity.Booking;
 import com.skybooker.booking.repository.BookingRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -19,11 +20,14 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final RestTemplate      restTemplate;
 
+    @Value("${service.flight.url}")
+    private String flightServiceUrl;
+
     @Override
     public BookingResponse bookFlight(BookingRequest request) {
 
         // Reduce seats in flight-service
-        String url = "http://localhost:8082/flights/" + request.getFlightId()
+        String url = flightServiceUrl + "/flights/" + request.getFlightId()
                 + "/reduce-seats?seats=" + request.getSeats();
 
         HttpHeaders headers = new HttpHeaders();
