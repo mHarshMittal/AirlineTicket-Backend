@@ -24,4 +24,5 @@ public class PaymentVerifyRequest {
     private String userEmail;
     private double amount;
     private String paymentMode;           // CARD, UPI, NETBANKING, WALLET
+    private String promoCode;             // optional – if applied, usage count incremented after PAID
 }

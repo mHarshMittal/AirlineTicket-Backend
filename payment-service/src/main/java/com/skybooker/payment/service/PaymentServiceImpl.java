@@ -32,6 +32,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository       paymentRepository;
     private final EmailNotificationService emailService;
     private final RestTemplate            restTemplate;
+    private final PromoCodeService        promoCodeService;
 
     @Value("${razorpay.key.id}")
     private String razorpayKeyId;
@@ -135,6 +136,11 @@ public class PaymentServiceImpl implements PaymentService {
 
         // 4. Confirm booking (PENDING → CONFIRMED) via booking-service
         confirmBooking(payment.getBookingId());
+
+        // 4b. Increment promo code usage if one was applied
+        if (request.getPromoCode() != null && !request.getPromoCode().isBlank()) {
+            promoCodeService.incrementUsage(request.getPromoCode());
+        }
 
         // 5. Send email asynchronously (errors are swallowed to keep response fast)
         try { sendConfirmationEmail(saved); }

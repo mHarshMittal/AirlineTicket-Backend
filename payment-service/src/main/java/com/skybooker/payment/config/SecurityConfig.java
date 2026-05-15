@@ -58,6 +58,11 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/v3/api-docs"
                         ).permitAll()
+                        // Promo code endpoints
+                        .requestMatchers("POST", "/payments/promo/apply").hasRole("PASSENGER")
+                        .requestMatchers("GET", "/payments/promo").hasRole("ADMIN")
+                        .requestMatchers("POST", "/payments/promo").hasRole("ADMIN")
+                        .requestMatchers("PUT", "/payments/promo/**").hasRole("ADMIN")
                         // Razorpay order creation and verification (authenticated passengers)
                         .requestMatchers("POST", "/payments/create-order").hasRole("PASSENGER")
                         .requestMatchers("POST", "/payments/verify").hasRole("PASSENGER")
