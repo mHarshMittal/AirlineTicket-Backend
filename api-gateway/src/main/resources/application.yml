@@ -14,7 +14,7 @@ spring:
         cors-configurations:
           '[/**]':
             allowedOrigins:
-              - "http://localhost:3000"     # Only your frontend (React) can call backend
+              - "https://airline-ticket-frontend.vercel.app/"     # Only your frontend (React) can call backend
             allowedMethods:
               - GET
               - POST
@@ -31,43 +31,43 @@ spring:
 
         # Auth Service - handles login/register APIs
         - id: auth-service
-          uri: http://localhost:8081
+          uri: https://airlineticket-backend-1.onrender.com
           predicates:
             - Path=/auth/**
 
         # Flight Service - flight-related APIs
         - id: flight-service
-          uri: http://localhost:8082
+          uri: https://airlineticket-backend-flight-service.onrender.com
           predicates:
             - Path=/flights/**
 
         # Booking Service - booking APIs
         - id: booking-service
-          uri: http://localhost:8083
+          uri: https://airlineticket-backend-flight-service.onrender.com
           predicates:
             - Path=/bookings/**
 
         # Passenger Service  - passengers APIs
         - id: passenger-service
-          uri: http://localhost:8084
+          uri: https://airlineticket-backend-1-nlqu.onrender.com
           predicates:
             - Path=/passengers/**
 
         # Payment Service - payments APIs
         - id: payment-service
-          uri: http://localhost:8085
+          uri: https://airlineticket-backend-payment-service.onrender.com
           predicates:
             - Path=/payments/**
 
         # Seat Service  seat selection APIs
         - id: seat-service
-          uri: http://localhost:8086
+          uri: https://airlineticket-backend-seat-service.onrender.com
           predicates:
             - Path=/seats/**
 
         # Airline Service - airline + airport APIs
         - id: airline-service
-          uri: http://localhost:8087
+          uri: https://airlineticket-backend-airline-service.onrender.com
           predicates:
             - Path=/airlines/**,/airports/**
 
