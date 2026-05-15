@@ -43,7 +43,7 @@ spring:
 
         # Booking Service - booking APIs
         - id: booking-service
-          uri: https://airlineticket-backend-flight-service.onrender.com
+          uri: https://airlineticket-backend-flight-booking.onrender.com
           predicates:
             - Path=/bookings/**
 
