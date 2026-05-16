@@ -1,12 +1,15 @@
-FROM eclipse-temurin:17-jdk-jammy
 
-# install maven
-RUN apt-get update && apt-get install -y maven
-
+# Stage 1: Build
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
 WORKDIR /app
-COPY . .
+COPY pom.xml .
+RUN mvn dependency:go-offline -q
+COPY src ./src
+RUN mvn clean package -DskipTests -q
 
-RUN mvn clean package -DskipTests
-
+# Stage 2: Run
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
-CMD ["sh", "-c", "java -jar target/*.jar"]
+CMD java -Dserver.port=$PORT -jar app.jar
