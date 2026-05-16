@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 spring:
   application:
@@ -7,14 +7,11 @@ spring:
 
   cloud:
     gateway:
-
-
-      # Global CORS configuration (frontend to gateway)
       globalcors:
         cors-configurations:
           '[/**]':
             allowedOrigins:
-              - "https://airline-ticket-frontend.vercel.app/"     # Only your frontend (React) can call backend
+              - "${FRONTEND_URL:http://localhost:3000}"
             allowedMethods:
               - GET
               - POST
@@ -26,57 +23,60 @@ spring:
             allowCredentials: true
             maxAge: 3600
 
-      # Route configuration (API Gateway routing logic)
-      routes:
+      httpclient:
+        connect-timeout: 10000
+        response-timeout: 60s
+        ssl:
+          use-insecure-trust-manager: true
 
-        # Auth Service - handles login/register APIs
+      routes:
         - id: auth-service
-          uri: https://airlineticket-backend-1.onrender.com
+          uri: ${AUTH_SERVICE_URL:http://localhost:8081}
           predicates:
             - Path=/auth/**
 
-        # Flight Service - flight-related APIs
         - id: flight-service
-          uri: https://airlineticket-backend-flight-service.onrender.com
+          uri: ${FLIGHT_SERVICE_URL:http://localhost:8082}
           predicates:
             - Path=/flights/**
 
-        # Booking Service - booking APIs
         - id: booking-service
-          uri: https://airlineticket-backend-flight-booking.onrender.com
+          uri: ${BOOKING_SERVICE_URL:http://localhost:8083}
           predicates:
             - Path=/bookings/**
 
-        # Passenger Service  - passengers APIs
         - id: passenger-service
-          uri: https://airlineticket-backend-1-nlqu.onrender.com
+          uri: ${PASSENGER_SERVICE_URL:http://localhost:8084}
           predicates:
             - Path=/passengers/**
 
-        # Payment Service - payments APIs
         - id: payment-service
-          uri: https://airlineticket-backend-payment-service.onrender.com
+          uri: ${PAYMENT_SERVICE_URL:http://localhost:8085}
           predicates:
             - Path=/payments/**
 
-        # Seat Service  seat selection APIs
         - id: seat-service
-          uri: https://airlineticket-backend-seat-service.onrender.com
+          uri: ${SEAT_SERVICE_URL:http://localhost:8086}
           predicates:
             - Path=/seats/**
 
-        # Airline Service - airline + airport APIs
         - id: airline-service
-          uri: https://airlineticket-backend-airline-service.onrender.com
+          uri: ${AIRLINE_SERVICE_URL:http://localhost:8087}
           predicates:
             - Path=/airlines/**,/airports/**
 
-# Actuator (health check & monitoring)
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty.http.client: DEBUG
+
 management:
   endpoints:
     web:
       exposure:
-        include: health, info
+        include: health, info, gateway
   endpoint:
     health:
       show-details: always
+    gateway:
+      enabled: true
